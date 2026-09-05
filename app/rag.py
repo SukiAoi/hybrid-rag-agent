@@ -1,8 +1,7 @@
-"""
+""" 
 RAG 检索模块
 ------------
-复用 c:\\python\\rag_advanced.py 的「混合检索 + RRF 融合 + LLM ReRank」思路，
-面向 onlyup_design.txt。
+「混合检索 + RRF 融合 + LLM ReRank」思路，面向本地文档语料（data/*.txt）。
 
 架构：
     问题 → BM25关键词召回 + 语义向量召回 → RRF 融合去重 → LLM ReRank → Top-K
@@ -23,7 +22,7 @@ from . import config
 
 logger = logging.getLogger(__name__)
 
-COLLECTION_NAME = "onlyup_docs"
+COLLECTION_NAME = "knowledge_docs"
 
 
 class RAGEngine:
@@ -107,7 +106,7 @@ class RAGEngine:
             self.collection = chroma_client.create_collection(
                 name=COLLECTION_NAME,
                 embedding_function=self.embedding_fn,
-                metadata={"description": "OnlyUp! 游戏设计文档知识库"},
+                metadata={"description": "文档知识库"},
             )
             all_chunks = []
             for txt_file in sorted(self.data_dir.glob("*.txt")):

@@ -7,8 +7,8 @@ LangGraph Agent 编排（v1.1 工具调用版）
         ↓
     ┌───────────── Agent (LLM) ─────────────┐
     │ 自己决定：                            │
-    │  · 查 OnlyUp 文档 → query_onlyup_docs │
-    │  · 数学计算       → calculator        │
+    │  · 查知识库文档 → query_docs          │
+    │  · 数学计算    → calculator           │
     │  · 都不用 → 直接回答                 │
     └─────────────┬─────────────────────────┘
                   ↓
@@ -26,9 +26,9 @@ from .rag import RAGEngine
 from .tools import build_tools
 
 SYSTEM_PROMPT = (
-    "你是 OnlyUp! 游戏设计文档助手，负责回答游戏设计相关问题，也能做数学计算。\n"
+    "你是文档知识库问答助手，负责回答文档内容相关问题，也能做数学计算。\n"
     "工具选择规则：\n"
-    "  - 用户问游戏设计、玩法、攀爬、跳跃、关卡、系统机制等 → 调用 query_onlyup_docs。\n"
+    "  - 用户问文档中的知识、概念、机制、参数等 → 调用 query_docs。\n"
     "  - 用户要求做数学计算（四则运算、幂、取模等）→ 调用 calculator。\n"
     "  - 其他闲聊可以直接回答，不需要调用工具。\n"
     "请用中文回答，简洁准确。引用文档内容时说明来源。"
@@ -56,7 +56,7 @@ def build_agent(rag: RAGEngine):
         model=_build_llm(),
         tools=tools,
         system_prompt=SYSTEM_PROMPT,
-        name="onlyup_agent",
+        name="hybrid_rag_agent",
     )
 
 

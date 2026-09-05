@@ -3,7 +3,7 @@
 =========================================
 
 演示用例：
-  1. 文档问题  → Agent 应该调用 query_onlyup_docs（RAG）
+  1. 文档问题  → Agent 应该调用 query_docs（RAG）
   2. 数学问题  → Agent 应该调用 calculator
   3. 闲聊      → Agent 应该不调用任何工具
 

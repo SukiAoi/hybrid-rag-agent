@@ -3,7 +3,7 @@ Agent 工具集
 ------------
 给 Agent 提供的两个工具，让它能自己决定用哪个：
 
-  1. query_onlyup_docs —— 查 OnlyUp! 游戏设计文档（RAG）
+  1. query_docs —— 查知识库文档（RAG）
   2. calculator —— 安全计算数学表达式
 
 设计要点：
@@ -78,10 +78,10 @@ def build_tools(rag):
     """根据 RAGEngine 构造完整工具列表（文档工具依赖 rag 实例）"""
 
     @tool
-    def query_onlyup_docs(question: str) -> str:
-        """查询 OnlyUp! 游戏设计文档知识库。
+    def query_docs(question: str) -> str:
+        """查询知识库文档。
 
-        任何关于攀爬、跳跃、关卡、玩法、系统设计的问题都应使用本工具。
+        任何与知识库文档内容相关的问题都应使用本工具。
         返回基于文档片段的回答，并附上来源文件。
         """
         if rag is None:
@@ -93,4 +93,4 @@ def build_tools(rag):
         source_line = f"（来源：{', '.join(sources)}）" if sources else ""
         return f"{source_line}\n{answer}"
 
-    return [calculator, query_onlyup_docs]
+    return [calculator, query_docs]

@@ -7,14 +7,14 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # ---------- 路径 ----------
-# 项目根目录（onlyup-rag-agent/）
+# 项目根目录（hybrid-rag-agent/）
 BASE_DIR = Path(__file__).resolve().parent.parent
-# 原始文档目录（放 onlyup_design.txt 等）
+# 原始文档目录（放 *.txt 文档）
 DATA_DIR = BASE_DIR / "data"
 # ChromaDB 持久化目录（运行时生成）
-CHROMA_DIR = BASE_DIR / "chroma_db_onlyup"
+CHROMA_DIR = BASE_DIR / "chroma_db"
 # 中文 embedding 模型专用库（与英文 ONNX 库隔离，维度不同）
-CHROMA_DIR_BGE = BASE_DIR / "chroma_db_onlyup_bge"
+CHROMA_DIR_BGE = BASE_DIR / "chroma_db_bge"
 
 # ---------- Embedding 模型 ----------
 # 可选值：onnx（默认，ONNXMiniLM_L6_V2 英文，无需 torch）

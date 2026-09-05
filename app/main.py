@@ -30,7 +30,7 @@ async def lifespan(app: FastAPI):
     logger.info("👋 应用关闭")
 
 
-app = FastAPI(title="OnlyUp! RAG Agent", version="1.1.0", lifespan=lifespan)
+app = FastAPI(title="Hybrid RAG Agent", version="1.1.0", lifespan=lifespan)
 agent = build_agent(rag)
 
 

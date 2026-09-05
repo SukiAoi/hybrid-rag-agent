@@ -1,7 +1,7 @@
 """
 检索命中率评估脚本（Retrieval Hit Rate Evaluation）
 ====================================================
-对 onlyup-rag-agent 的混合检索（BM25 + 语义向量 + RRF 融合）做量化评估，
+对 hybrid-rag-agent 的混合检索（BM25 + 语义向量 + RRF 融合）做量化评估，
 统计 Hit Rate@1 / @3 / @5 与 MRR，并把结果写入 docs/RETRIEVAL_EVAL.md。
 
 指标定义（简历可直接引用的检索质量量化指标）：
