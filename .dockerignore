@@ -1,0 +1,38 @@
+# 环境变量与密钥（绝不进镜像）
+.env
+
+# 虚拟环境
+.venv/
+venv/
+
+# Python 产物
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# 版本控制与仓库元数据
+.git/
+.gitignore
+.gitattributes
+
+# 运行时生成的向量库（容器内重新构建，用卷持久化）
+chroma_db/
+chroma_db_bge/
+chroma_db_onlyup/
+chroma_db_onlyup_bge/
+*.sqlite3
+
+# 体积大且非运行必需
+docs/*.json
+docs/*.png
+
+# 测试与文档
+tests/
+README.md
+PITFALLS.md
+LICENSE
+docker-compose.yml
+Dockerfile
+.dockerignore

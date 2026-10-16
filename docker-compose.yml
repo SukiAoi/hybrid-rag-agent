@@ -1,0 +1,33 @@
+# 一键起服务：docker compose up -d
+# 依赖：同目录下需有 .env（从 .env.example 复制并填入 DEEPSEEK_API_KEY）
+services:
+  api:
+    build: .
+    image: hybrid-rag-agent:latest
+    container_name: hybrid-rag-agent
+    ports:
+      - "8000:8000"
+    # .env 里的 DEEPSEEK_API_KEY 是启动必需项，缺了服务起不来
+    env_file:
+      - .env
+    environment:
+      # 默认英文 ONNX 本地向量模型；要跑中文语义检索可改为 bge
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-onnx}
+    volumes:
+      # 持久化向量库，重建容器不用重新切块、重新向量化
+      - chroma_data:/app/chroma_db
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request;urllib.request.urlopen('http://127.0.0.1:8000/health')"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      # 首次启动要构建知识库 + 首次运行需下载 ONNX 模型，给足冷启动时间
+      start_period: 90s
+
+volumes:
+  chroma_data:
