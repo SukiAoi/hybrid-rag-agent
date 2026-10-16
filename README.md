@@ -25,9 +25,13 @@ hybrid-rag-agent/
 │   └── config.py    # 配置（API Key、路径、检索参数）
 ├── data/            # 原始文档（*.txt）
 ├── chroma_db/       # ChromaDB 持久化（运行时生成）
-├── demo_tools.py    # 工具调用演示脚本（v1.1）
+├── demo_tools.py        # 工具调用演示脚本（v1.1）
+├── tests/               # 冒烟测试（只测 /health）
+├── Dockerfile           # 容器镜像
+├── docker-compose.yml   # 一键起服务
 ├── requirements.txt
-└── .env.example     # 环境变量模板
+├── requirements-dev.txt # 测试依赖（pytest + httpx）
+└── .env.example         # 环境变量模板
 ```
 
 ## 工具调用 / Tool Calling
@@ -134,8 +138,63 @@ EMBEDDING_MODEL=bge .venv\Scripts\python.exe eval_retrieval.py --embed bge
 - 模型首次运行会下载，之后缓存在本地。
 - 踩坑记录见 [PITFALLS.md](PITFALLS.md)。
 
+## 部署 / Deployment
+
+### 方式一：Docker Compose（推荐）
+
+```bash
+# 1. 准备环境变量：DEEPSEEK_API_KEY 为必填，缺了应用起不来
+copy .env.example .env
+
+# 2. 构建并后台启动
+docker compose up -d --build
+
+# 3. 探针
+curl http://127.0.0.1:8000/health     # {"status":"ok","kb_chunks":N}
+```
+
+交互式文档：<http://127.0.0.1:8000/docs>
+
+### 方式二：直接 docker run
+
+```bash
+docker build -t hybrid-rag-agent .
+docker run -d --name hybrid-rag-agent --env-file .env -p 8000:8000 ^
+  -v chroma_data:/app/chroma_db hybrid-rag-agent
+```
+
+### 环境变量
+
+| 变量 | 必填 | 默认 | 说明 |
+|------|:---:|------|------|
+| `DEEPSEEK_API_KEY` | ✅ | — | 生成与 ReRank 用；**为空时应用启动即报错** |
+| `DEEPSEEK_BASE_URL` | | `https://api.deepseek.com` | OpenAI 兼容端点 |
+| `DEEPSEEK_MODEL` | | `deepseek-chat` | 模型名 |
+| `EMBEDDING_MODEL` | | `onnx` | `onnx`（本地英文 ONNX）/ `bge`（中文，需额外装 torch，本镜像未含） |
+
+### 健康探针
+
+镜像内置 `HEALTHCHECK`，用 Python 标准库请求 `GET /health`（镜像里没有 curl）。
+`/health` 返回 `{"status": "ok", "kb_chunks": <块数>}`；只有知识库预热完成后 `kb_chunks` 才非 0，可直接当就绪探针使用。
+
+### 持久化
+
+向量库位于容器内 `/app/chroma_db`，`docker-compose.yml` 已挂载 `chroma_data` 卷，重建容器无需重新切块与向量化。
+
+> ⚠️ **首次运行需要出网**：本地 ONNX 向量模型（`all-MiniLM-L6-v2`，约 79 MB）缓存在宿主机 `~/.cache/chroma/onnx_models/`，容器内是干净的，第一次向量化会自动从 S3 下载。部署环境出网受限时，需预置该缓存目录或改用其他向量化方案。
+
+### 跑测试
+
+```bash
+pip install -r requirements-dev.txt
+python -m pytest tests/ -q      # 在仓库根目录执行
+```
+
+冒烟测试只打 `/health`（验证服务能起、知识库加载成功），**不会**调用 DeepSeek，因此不需要真实 Key；`tests/conftest.py` 会在导入应用前注入一个假 Key。
+
 ## Roadmap / 计划
 
 - [x] `create_agent` 接入工具调用（`query_docs` + `calculator`）—— v1.1 ✅
 - [x] 检索质量评估：命中率对比（ONNX vs BGE 中文）—— Hit@3 **95%** / Hit@5 **100%** ✅
+- [x] 容器化部署配置（Dockerfile / docker-compose）+ `/health` 冒烟测试 ✅
 - [ ] 更多领域文档入库
