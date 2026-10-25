@@ -8,9 +8,10 @@ FastAPI 入口
 import logging
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
-from pydantic import BaseModel
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, Field
 
+from . import config
 from .agent import build_agent, invoke_agent
 from .rag import RAGEngine
 
@@ -35,7 +36,13 @@ agent = build_agent(rag)
 
 
 class AskRequest(BaseModel):
-    question: str
+    # 边界校验：空问题会直接调用一次 LLM，超长问题会烧掉大量 token
+    question: str = Field(
+        ...,
+        min_length=1,
+        max_length=config.MAX_QUESTION_LEN,
+        description=f"用户问题，1–{config.MAX_QUESTION_LEN} 字",
+    )
 
 
 class ToolStep(BaseModel):
@@ -58,12 +65,16 @@ def health() -> dict:
 
 @app.post("/ask", response_model=AskResponse)
 def ask(req: AskRequest) -> AskResponse:
-    logger.info("❓ 收到问题：%s", req.question)
-    result = invoke_agent(agent, req.question)
+    question = req.question.strip()
+    if not question:
+        raise HTTPException(status_code=422, detail="问题不能为空")
+    logger.info("❓ 收到问题：%s", question)
+    result = invoke_agent(agent, question)
     tools_used = result["tools_used"]
     logger.info("🛠️ 使用的工具：%s", tools_used or "（无，直接回答）")
     return AskResponse(
         answer=result["answer"],
+        sources=result["sources"],
         tools_used=tools_used,
         steps=[ToolStep(**s) for s in result["steps"]],
     )
