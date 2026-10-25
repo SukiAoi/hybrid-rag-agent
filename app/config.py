@@ -4,11 +4,13 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-load_dotenv()
-
 # ---------- 路径 ----------
 # 项目根目录（hybrid-rag-agent/）
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# 显式加载项目根目录的 .env：不依赖启动时的工作目录，从任意路径启动都能读到 Key
+load_dotenv(BASE_DIR / ".env")
+
 # 原始文档目录（放 *.txt 文档）
 DATA_DIR = BASE_DIR / "data"
 # ChromaDB 持久化目录（运行时生成）
@@ -28,6 +30,13 @@ EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "onnx")
 DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
 DEEPSEEK_BASE_URL = os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
 DEEPSEEK_MODEL = os.getenv("DEEPSEEK_MODEL", "deepseek-chat")
+
+# 超时与重试：SDK 默认超时可达 600s，上游卡住会占满线程池，必须显式收窄
+LLM_TIMEOUT_S = float(os.getenv("LLM_TIMEOUT_S", "30"))
+LLM_MAX_RETRIES = int(os.getenv("LLM_MAX_RETRIES", "2"))
+
+# 单次提问的字符上限（防止超长输入把 token 账单打爆）
+MAX_QUESTION_LEN = int(os.getenv("MAX_QUESTION_LEN", "500"))
 
 # ---------- 检索参数 ----------
 CHUNK_SIZE = 300        # OnlyUp 文档较长，块稍大

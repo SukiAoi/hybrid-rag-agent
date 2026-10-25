@@ -14,10 +14,17 @@ WORKDIR /app
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
+# 非 root 运行：应用层一旦出现文件写入/命令执行漏洞，不至于直接拿到容器 root
+RUN useradd --create-home --uid 10001 appuser \
+    && mkdir -p /app/chroma_db \
+    && chown -R appuser:appuser /app
+
 # 只拷贝运行必需的资源
-COPY app/ ./app/
-COPY data/ ./data/
-COPY .env.example ./
+COPY --chown=appuser:appuser app/ ./app/
+COPY --chown=appuser:appuser data/ ./data/
+COPY --chown=appuser:appuser .env.example ./
+
+USER appuser
 
 EXPOSE 8000
 
