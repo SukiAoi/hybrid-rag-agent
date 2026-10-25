@@ -67,7 +67,13 @@ class RAGEngine:
         # LLM：DeepSeek（OpenAI 兼容协议），用于生成与 ReRank
         if not config.DEEPSEEK_API_KEY:
             raise RuntimeError("未设置 DEEPSEEK_API_KEY，请复制 .env.example 为 .env 并填入 Key")
-        self.llm = OpenAI(api_key=config.DEEPSEEK_API_KEY, base_url=config.DEEPSEEK_BASE_URL)
+        # 显式超时：SDK 默认最长可等 600s，上游卡住会把同步端点的线程池吃满
+        self.llm = OpenAI(
+            api_key=config.DEEPSEEK_API_KEY,
+            base_url=config.DEEPSEEK_BASE_URL,
+            timeout=config.LLM_TIMEOUT_S,
+            max_retries=config.LLM_MAX_RETRIES,
+        )
         self._ready = True
 
     # ================= 1. 文档切块 =================
@@ -136,12 +142,21 @@ class RAGEngine:
         return [(i, scores[i]) for i in top if scores[i] > 0]
 
     def _semantic_search(self, query: str, top_k: int = config.SEMANTIC_TOP_K):
+        """语义召回：直接返回 (块索引, 文本)
+
+        用 Chroma 返回的 id（chunk_{i}）反解索引，而不是拿文本去 all_documents
+        里 index() 查找 —— 后者是 O(n) 的线性扫描，且遇到重复文本会全部命中第一个，
+        导致 RRF 把两路召回错误合并。
+        """
         results = self.collection.query(query_texts=[query], n_results=top_k)
         out = []
-        for i in range(len(results["documents"][0])):
-            text = results["documents"][0][i]
-            dist = results["distances"][0][i] if results.get("distances") else 0
-            out.append((text, dist))
+        for i, chunk_id in enumerate(results["ids"][0]):
+            try:
+                idx = int(str(chunk_id).rsplit("_", 1)[-1])
+            except (ValueError, IndexError):
+                logger.warning("⚠️ 无法解析块 id：%s，跳过", chunk_id)
+                continue
+            out.append((idx, results["documents"][0][i]))
         return out
 
     # ================= 4. RRF 融合去重 =================
@@ -153,10 +168,8 @@ class RAGEngine:
             rrf_scores[idx] = rrf_scores.get(idx, 0) + 1.0 / (k + rank)
             if idx >= 0:
                 doc_info[idx] = self.all_documents[idx]
-        for rank, (text, _dist) in enumerate(semantic_results, start=1):
-            try:
-                idx = self.all_documents.index(text)
-            except ValueError:
+        for rank, (idx, text) in enumerate(semantic_results, start=1):
+            if idx < 0 or idx >= len(self.all_documents):
                 continue
             rrf_scores[idx] = rrf_scores.get(idx, 0) + 1.0 / (k + rank)
             doc_info[idx] = text
