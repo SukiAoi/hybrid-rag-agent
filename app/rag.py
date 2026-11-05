@@ -246,5 +246,7 @@ class RAGEngine:
             model=config.DEEPSEEK_MODEL,
             messages=[{"role": "user", "content": prompt}],
             temperature=0.3,
+            # 限制输出长度：既是成本闸，也避免长文拖慢响应
+            max_tokens=config.MAX_ANSWER_TOKENS,
         )
         return resp.choices[0].message.content.strip(), sources

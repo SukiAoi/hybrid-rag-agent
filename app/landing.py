@@ -90,7 +90,9 @@ async function ask() {
     const ms = Math.round(performance.now() - t0);
     if (!r.ok) {
       ans.className = 'answer err';
-      ans.textContent = (data.detail ? '请求失败：' + JSON.stringify(data.detail) : '请求失败');
+      ans.textContent = (typeof data.detail === 'string')
+        ? data.detail
+        : ('请求失败（HTTP ' + r.status + '）');
     } else {
       ans.textContent = data.answer || '（无内容）';
       const src = (data.sources && data.sources.length) ? data.sources.join('、') : '—';

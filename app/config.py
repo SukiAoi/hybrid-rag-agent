@@ -45,3 +45,12 @@ BM25_TOP_K = 5          # BM25 关键词召回
 SEMANTIC_TOP_K = 5      # 语义向量召回
 FINAL_TOP_K = 3         # ReRank 后最终返回给 LLM 的块数
 RRF_K = 60              # RRF 平滑参数（score = Σ 1/(k+rank)）
+# ---------- 限流与成本保护 ----------
+# 单 IP 每分钟最多几次（防止脚本连发）
+RATE_LIMIT_PER_MIN = int(os.getenv("RATE_LIMIT_PER_MIN", "3"))
+# 单 IP 每天最多几次
+RATE_LIMIT_PER_DAY = int(os.getenv("RATE_LIMIT_PER_DAY", "20"))
+# 全站每天总次数上限（最硬的一道闸，超了就停，保护余额）
+GLOBAL_DAILY_QUOTA = int(os.getenv("GLOBAL_DAILY_QUOTA", "300"))
+# 单次回答的最大输出 token（限制成本，也避免长文拖慢响应）
+MAX_ANSWER_TOKENS = int(os.getenv("MAX_ANSWER_TOKENS", "800"))
