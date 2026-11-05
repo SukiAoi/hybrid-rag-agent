@@ -9,10 +9,12 @@ import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 
 from . import config
 from .agent import build_agent, invoke_agent
+from .landing import INDEX_HTML
 from .rag import RAGEngine
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -56,6 +58,12 @@ class AskResponse(BaseModel):
     sources: list[str] = []
     tools_used: list[str] = []
     steps: list[ToolStep] = []
+
+
+@app.get("/", response_class=HTMLResponse, include_in_schema=False)
+def index() -> str:
+    """首页：给非技术访客一个能直接提问的界面（默认的 404 JSON 不适合演示）"""
+    return INDEX_HTML
 
 
 @app.get("/health")
