@@ -1,0 +1,58 @@
+services:
+  api:
+    # 首次部署用 --build 在服务器上构建；接上 CI 后改为 pull ghcr 镜像
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    image: ghcr.io/sukiaoi/hybrid-rag-agent:latest
+    container_name: rag-api
+    restart: unless-stopped
+    env_file:
+      - .env
+    expose:
+      - "8000"
+    volumes:
+      - chroma_data:/app/chroma_db
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request;urllib.request.urlopen('http://127.0.0.1:8000/health')"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 180s
+    # 2C4G 机器：给应用 1.2G 上限，留 2.8G 给系统与构建缓存
+    mem_limit: 1200m
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - api
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  chroma_data:
+  caddy_data:
+  caddy_config:

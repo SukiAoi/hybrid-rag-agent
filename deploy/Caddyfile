@@ -1,0 +1,29 @@
+# 域名从环境变量注入（docker-compose 里传 DOMAIN）
+{$DOMAIN} {
+	encode gzip
+
+	reverse_proxy api:8000 {
+		# 流式响应不要缓冲
+		flush_interval -1
+	}
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+
+	log {
+		output file /data/access.log {
+			roll_size 10mb
+			roll_keep 3
+		}
+	}
+}
+
+# HTTP 自动跳 HTTPS（Caddy 默认行为，这里显式写出来便于理解）
+http://{$DOMAIN} {
+	redir https://{host}{uri} permanent
+}
