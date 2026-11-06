@@ -43,10 +43,10 @@ INDEX_HTML = """<!doctype html>
 <body>
 <div class="wrap">
   <h1>Hybrid RAG Agent</h1>
-  <div class="sub">混合检索（BM25 + 语义向量 + RRF）文档问答 · 知识库：OnlyUp 游戏设计文档</div>
+  <div class="sub">混合检索（BM25 + 语义向量 + RRF）文档问答 · 知识库：本项目的 README / 架构 / 踩坑 / 部署文档</div>
 
   <div class="card">
-    <textarea id="q" placeholder="例如：玩家移动状态机有哪些状态？"></textarea>
+    <textarea id="q" placeholder="例如：这个项目是怎么部署的？踩过哪些坑？"></textarea>
     <div class="row">
       <button id="go" onclick="ask()">提问</button>
       <span class="hint">首次请求需加载模型，约 3–10 秒</span>

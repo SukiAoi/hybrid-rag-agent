@@ -54,3 +54,16 @@ RATE_LIMIT_PER_DAY = int(os.getenv("RATE_LIMIT_PER_DAY", "20"))
 GLOBAL_DAILY_QUOTA = int(os.getenv("GLOBAL_DAILY_QUOTA", "300"))
 # 单次回答的最大输出 token（限制成本，也避免长文拖慢响应）
 MAX_ANSWER_TOKENS = int(os.getenv("MAX_ANSWER_TOKENS", "800"))
+# ---------- 知识库：额外把项目自身文档也入库 ----------
+# 目的：让线上 demo 能回答"这个项目怎么部署、为什么这么设计、踩过什么坑"，
+# 相当于一个可交互的项目介绍。
+EXTRA_DOCS = [
+    "README.md",
+    "PITFALLS.md",
+    "deploy/README.md",
+    "docs/demo_qa.md",
+]
+
+# 语料版本号：内容变更时把它 +1，会自动建一个新集合，避免读到旧索引。
+# （Chroma 的集合名固定，不换名就会一直加载旧的 13 个块）
+CORPUS_VERSION = os.getenv("CORPUS_VERSION", "2")

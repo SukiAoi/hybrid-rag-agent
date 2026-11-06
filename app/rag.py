@@ -22,7 +22,8 @@ from . import config
 
 logger = logging.getLogger(__name__)
 
-COLLECTION_NAME = "knowledge_docs"
+# 集合名带语料版本号：语料一变就换新集合，避免读到旧索引
+COLLECTION_NAME = f"knowledge_docs_v{config.CORPUS_VERSION}"
 
 
 class RAGEngine:
@@ -81,12 +82,17 @@ class RAGEngine:
     def _load_and_split(file_path, chunk_size=config.CHUNK_SIZE, overlap=config.CHUNK_OVERLAP):
         with open(file_path, encoding="utf-8") as f:
             text = f.read()
+        # 用相对项目根目录的路径作来源：避免 deploy/README.md 与 README.md 同名混淆
+        try:
+            source = str(file_path.relative_to(config.BASE_DIR)).replace("\\", "/")
+        except ValueError:
+            source = file_path.name
         chunks, start = [], 0
         while start < len(text):
             end = min(start + chunk_size, len(text))
             chunk_text = text[start:end].strip()
             if chunk_text:
-                chunks.append({"text": chunk_text, "source": file_path.name})
+                chunks.append({"text": chunk_text, "source": source})
             start += chunk_size - overlap
         return chunks
 
@@ -118,6 +124,15 @@ class RAGEngine:
             for txt_file in sorted(self.data_dir.glob("*.txt")):
                 chunks = self._load_and_split(txt_file)
                 logger.info("   📄 %s: %d 个块", txt_file.name, len(chunks))
+                all_chunks.extend(chunks)
+            # 项目自身的文档也入库：让 demo 能回答"这个项目怎么做的、踩过什么坑"
+            for rel in config.EXTRA_DOCS:
+                doc_path = config.BASE_DIR / rel
+                if not doc_path.exists():
+                    logger.warning("   ⚠️ 跳过不存在的文档：%s", rel)
+                    continue
+                chunks = self._load_and_split(doc_path)
+                logger.info("   📄 %s: %d 个块", rel, len(chunks))
                 all_chunks.extend(chunks)
             for i, chunk in enumerate(all_chunks):
                 self.collection.add(
