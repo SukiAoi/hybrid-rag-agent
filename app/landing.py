@@ -43,7 +43,7 @@ INDEX_HTML = """<!doctype html>
 <body>
 <div class="wrap">
   <h1>Hybrid RAG Agent</h1>
-  <div class="sub">混合检索（BM25 + 语义向量 + RRF）文档问答 · 知识库：本项目的 README / 架构 / 踩坑 / 部署文档</div>
+  <div class="sub">混合检索（BM25 + 语义向量 + RRF）· 20 题评测 Hit@3 95% / MRR 0.771 · 知识库：本项目文档（README / 踩坑 / 部署）</div>
 
   <div class="card">
     <textarea id="q" placeholder="例如：这个项目是怎么部署的？踩过哪些坑？"></textarea>
