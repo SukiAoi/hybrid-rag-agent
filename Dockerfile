@@ -24,6 +24,11 @@ COPY --chown=appuser:appuser app/ ./app/
 COPY --chown=appuser:appuser data/ ./data/
 COPY --chown=appuser:appuser .env.example ./
 
+# 项目自身文档也进镜像：它们会被当作知识库语料（见 config.EXTRA_DOCS）
+COPY --chown=appuser:appuser README.md PITFALLS.md ./
+COPY --chown=appuser:appuser docs/ ./docs/
+COPY --chown=appuser:appuser deploy/README.md ./deploy/
+
 USER appuser
 
 EXPOSE 8000
