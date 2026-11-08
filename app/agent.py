@@ -29,6 +29,8 @@ from .tools import build_tools
 
 # 工具返回文本里的来源标记：「（来源：a.txt, b.txt）」→ 提取出文件名
 _SOURCES_RE = re.compile(r"来源：([^）)]+)")
+# 只接受文件名形态的条目，避免从答案正文里误抓片段当作来源
+_SOURCE_NAME_RE = re.compile(r"^[\w\-./\\\u4e00-\u9fa5]+\.(txt|md|py|json|csv|ya?ml)$", re.I)
 
 SYSTEM_PROMPT = (
     "你是文档知识库问答助手，负责回答文档内容相关问题，也能做数学计算。\n"
@@ -116,7 +118,7 @@ def invoke_agent(agent, question: str) -> dict:
         for matched in _SOURCES_RE.findall(step["result"]):
             for name in matched.split(","):
                 name = name.strip()
-                if name and name not in sources:
+                if name and name not in sources and _SOURCE_NAME_RE.match(name):
                     sources.append(name)
 
     tools_used = [s["tool"] for s in steps]
