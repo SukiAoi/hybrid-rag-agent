@@ -1,3 +1,7 @@
+> **评测语料**：OnlyUp 游戏设计文档（约 30KB，2026-09）。
+> 此报告用于验证检索方案（混合检索 / 换 embedding / ReRank 消融），**与当前线上语料无关**。
+> 当前线上知识库为跨境 B2B 业务示例数据。
+
 # 检索质量评估报告（Retrieval Hit Rate）
 
 - Embedding 模型：**ONNXMiniLM_L6_V2（英文）**

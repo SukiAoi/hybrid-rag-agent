@@ -3,7 +3,7 @@ FastAPI 入口
 ------------
 启动：  uvicorn app.main:app --reload
 文档：   http://127.0.0.1:8000/docs
-测试：   curl -X POST http://127.0.0.1:8000/ask -H "Content-Type: application/json" -d "{\"question\": \"攀爬系统有几个状态？\"}"
+测试：   curl -X POST http://127.0.0.1:8000/ask -H "Content-Type: application/json" -d "{\"question\": \"出口欧盟需要哪些认证？\"}"
 """
 import logging
 from contextlib import asynccontextmanager

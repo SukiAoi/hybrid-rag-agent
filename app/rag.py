@@ -252,7 +252,9 @@ class RAGEngine:
         context_text = "\n\n---\n\n".join(c["text"] for c in contexts)
         sources = sorted({c["source"] for c in contexts if c.get("source")})
         prompt = (
-            "你是一个 OnlyUp! 游戏设计文档助手。请严格依据下面的文档片段回答用户问题。\n"
+            "你是企业知识库问答助手，知识库内容为跨境 B2B 业务资料"
+            "（产品参数、认证合规、售后 FAQ、SOP 流程、询盘处理）。\n"
+            "请严格依据下面的文档片段回答用户问题。\n"
             "如果片段中没有相关信息，就明确说“文档中未找到相关信息”，不要编造。\n\n"
             f"文档片段：\n{context_text}\n\n"
             f"用户问题：{query}\n\n回答："

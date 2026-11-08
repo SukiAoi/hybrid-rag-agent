@@ -18,11 +18,11 @@ from app.rag import RAGEngine
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
 CASES = [
-    "攀爬系统有哪些状态？",
-    "2 ** 10 + 5 * 3 等于多少？",
-    "你好，今天天气怎么样？",
-    "把跳跃高度从 3 改成 5 会影响什么？",
-    "(1024 - 24) / 10 是多少？",
+    "出口欧盟需要哪些认证？",
+    "收到海外询盘后第一步做什么？",
+    "500 台乘以 128 美元是多少？",
+    "充电桩 EV-11 的防护等级是多少？",
+    "今天深圳天气怎么样？",
 ]
 
 
@@ -37,13 +37,13 @@ def fmt_steps(steps: list[dict]) -> str:
 
 def main() -> None:
     print("=" * 72)
-    print("🛠️  OnlyUp! Agent 工具调用演示（v1.1）")
+    print("🛠️  企业知识库 Agent 工具调用演示（v1.1）")
     print("=" * 72)
 
     rag = RAGEngine()
     rag.build()
     agent = build_agent(rag)
-    print("✅ Agent 已就绪，工具：calculator, query_onlyup_docs\n")
+    print("✅ Agent 已就绪，工具：calculator, query_docs\n")
 
     for q in CASES:
         print("-" * 72)

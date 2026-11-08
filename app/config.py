@@ -39,7 +39,7 @@ LLM_MAX_RETRIES = int(os.getenv("LLM_MAX_RETRIES", "2"))
 MAX_QUESTION_LEN = int(os.getenv("MAX_QUESTION_LEN", "500"))
 
 # ---------- 检索参数 ----------
-CHUNK_SIZE = 300        # OnlyUp 文档较长，块稍大
+CHUNK_SIZE = 300        # 业务文档单条信息较短，块偏小以便精确命中
 CHUNK_OVERLAP = 80      # 块重叠
 BM25_TOP_K = 5          # BM25 关键词召回
 SEMANTIC_TOP_K = 5      # 语义向量召回

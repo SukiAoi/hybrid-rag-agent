@@ -143,7 +143,7 @@ def _eval_mode(engine: RAGEngine, gold_map: dict, use_rerank: bool) -> tuple[lis
 
 def run(use_rerank: bool = False, embed: str = "onnx") -> None:
     print("=" * 76)
-    print("📊 OnlyUp! RAG 检索命中率评估")
+    print("📊 RAG 检索命中率评估（语料：OnlyUp 设计文档，2026-09）")
     print("=" * 76)
 
     # bge 中文模型与 onnx 英文模型维度不同，需要隔离的 Chroma 库
@@ -290,7 +290,7 @@ def _render_detail(title: str, rows: list[dict]) -> list[str]:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="OnlyUp! RAG 检索命中率评估")
+    parser = argparse.ArgumentParser(description="RAG 检索命中率评估（语料：OnlyUp 设计文档，2026-09）")
     parser.add_argument(
         "--rerank", action="store_true", help="走完整 retrieve（含 LLM ReRank，消耗 DeepSeek）"
     )
