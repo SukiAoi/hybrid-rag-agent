@@ -66,4 +66,4 @@ EXTRA_DOCS = [
 
 # 语料版本号：内容变更时把它 +1，会自动建一个新集合，避免读到旧索引。
 # （Chroma 的集合名固定，不换名就会一直加载旧的 13 个块）
-CORPUS_VERSION = os.getenv("CORPUS_VERSION", "5")
+CORPUS_VERSION = os.getenv("CORPUS_VERSION", "6")
