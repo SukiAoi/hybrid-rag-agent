@@ -55,6 +55,11 @@ jobs:
     name: deploy to server
     needs: build
     runs-on: ubuntu-latest
+    # 没配 SSH secrets 时这个 job 必然失败，所以用仓库变量显式开启：
+    #   Settings → Secrets and variables → Actions → Variables
+    #   新建 ENABLE_DEPLOY = true
+    # 在那之前自动跳过，不产生失败记录。
+    if: ${{ vars.ENABLE_DEPLOY == 'true' }}
     steps:
       - uses: appleboy/ssh-action@v1
         with:
