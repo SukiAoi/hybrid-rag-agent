@@ -12,6 +12,7 @@ RAG 检索模块
   3. HuggingFace 国内下载慢 → 优先 ONNX（走 ChromaDB CDN，~23MB）
 """
 import logging
+import re
 
 import chromadb
 from chromadb.utils import embedding_functions
@@ -19,6 +20,9 @@ from openai import OpenAI
 from rank_bm25 import BM25Okapi
 
 from . import config
+
+# 编号类查询的识别：SOP-01 / EV-11 / PS-500 / IP65 这类「字母 + 数字」的代号
+_CODE_RE = re.compile(r"[A-Za-z]{2,}[-_]?\d+[A-Za-z]?", re.I)
 
 logger = logging.getLogger(__name__)
 
@@ -202,6 +206,25 @@ class RAGEngine:
         ]
 
     # ================= 5. 检索（融合 + ReRank） =================
+    def _exact_code_blocks(self, query: str) -> list[int]:
+        """编号类查询（SOP-01 / EV-11 / PS-500）直接做子串匹配。
+
+        短查询里编号会被 BM25 的字符切分和向量语义同时稀释，
+        实测「SOP-01流程」这种问法两种召回都排不到前面，所以单独兜一层。
+        """
+        codes = {m.group(0).upper().replace("_", "-") for m in _CODE_RE.finditer(query)}
+        if not codes:
+            return []
+        hits: list[int] = []
+        for i, doc in enumerate(self.all_documents):
+            up = doc.upper().replace("_", "-")
+            flat = up.replace("-", "")
+            for c in codes:
+                if c in up or c.replace("-", "") in flat:
+                    hits.append(i)
+                    break
+        return hits
+
     def retrieve(self, query: str, top_k: int = config.FINAL_TOP_K) -> list[dict]:
         """返回 ReRank 后的 Top-K 候选块，按相关度降序"""
         self._ensure_models()
@@ -211,6 +234,17 @@ class RAGEngine:
         bm25_results = self._bm25_search(query)
         semantic_results = self._semantic_search(query)
         fused = self._reciprocal_rank_fusion(bm25_results, semantic_results)
+
+        # 编号精确命中优先，且跳过 ReRank（命中即高置信，没必要再让模型重排）
+        exact = self._exact_code_blocks(query)
+        if exact:
+            hits = [
+                {"text": self.all_documents[i], "source": self.doc_sources.get(i, "unknown")}
+                for i in exact[:top_k]
+            ]
+            seen = {h["text"] for h in hits}
+            rest = [c for c in fused if c["text"] not in seen]
+            return (hits + rest)[:top_k]
 
         if len(fused) <= top_k:
             return fused
