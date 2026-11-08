@@ -57,13 +57,13 @@ MAX_ANSWER_TOKENS = int(os.getenv("MAX_ANSWER_TOKENS", "800"))
 # ---------- 知识库：额外把项目自身文档也入库 ----------
 # 目的：让线上 demo 能回答"这个项目怎么部署、为什么这么设计、踩过什么坑"，
 # 相当于一个可交互的项目介绍。
+# 只保留 README（覆盖技术栈、评测、部署概览）；
+# PITFALLS / deploy / demo_qa 会让业务类问题的召回变噪，故不入选。
+# 要去掉项目自述，把 EXTRA_DOCS 设为 [] 即可。
 EXTRA_DOCS = [
     "README.md",
-    "PITFALLS.md",
-    "deploy/README.md",
-    "docs/demo_qa.md",
 ]
 
 # 语料版本号：内容变更时把它 +1，会自动建一个新集合，避免读到旧索引。
 # （Chroma 的集合名固定，不换名就会一直加载旧的 13 个块）
-CORPUS_VERSION = os.getenv("CORPUS_VERSION", "3")
+CORPUS_VERSION = os.getenv("CORPUS_VERSION", "5")

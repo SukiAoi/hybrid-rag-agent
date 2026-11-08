@@ -43,10 +43,10 @@ INDEX_HTML = """<!doctype html>
 <body>
 <div class="wrap">
   <h1>Hybrid RAG Agent</h1>
-  <div class="sub">混合检索（BM25 + 语义向量 + RRF）· 20 题评测 Hit@3 95% / MRR 0.771 · 知识库：本项目文档（README / 踩坑 / 部署）</div>
+  <div class="sub">混合检索（BM25 + 语义向量 + RRF）· 20 题评测 Hit@3 95% · 知识库：跨境 B2B 示例数据（产品 / 认证 / 售后 / SOP）</div>
 
   <div class="card">
-    <textarea id="q" placeholder="例如：这个项目是怎么部署的？踩过哪些坑？"></textarea>
+    <textarea id="q" placeholder="例如：出口欧盟需要哪些认证？询盘怎么处理？"></textarea>
     <div class="row">
       <button id="go" onclick="ask()">提问</button>
       <span class="hint">首次请求需加载模型，约 3–10 秒</span>
