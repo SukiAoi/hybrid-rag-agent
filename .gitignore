@@ -14,7 +14,8 @@ venv/
 
 # 数据与知识库（运行时生成，不入库）
 data/*
-!data/onlyup_design.txt
+!data/*.txt
+data_archive/
 chroma_db_onlyup/
 chroma_db_onlyup_bge/
 chroma_db/

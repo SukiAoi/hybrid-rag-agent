@@ -1,0 +1,31 @@
+海外询盘样例与识别要点
+
+样例一
+主题 Inquiry about portable power station 500W
+正文
+Hi, we are a distributor of outdoor equipment in Germany. We saw your PS-500 on your website. Could you send the price list for 500 units? Do you have CE and UN38.3? We need the EU plug version. What is your MOQ and lead time?
+From: Thomas Müller, Outdoor Energy GmbH, Germany
+识别要点 客户类型为分销商；目标市场德国需要 CE 与欧标插头；数量 500 台已过起订量；认证是成交关键；属 A 级询盘，24 小时内必须报价。
+
+样例二
+主题 price?
+正文
+how much
+From: 未知邮箱，无签名，无公司信息
+识别要点 信息严重不足，属 C 级询盘。先回复一封标准问询邮件，索取公司名、国家、用途、数量，不直接报价。
+
+样例三
+主题 关于充电桩合作
+正文
+你好，我们是深圳一家充电运营商，看到你们的 EV-11，想了解 380V 三相版本的价格，以及是否支持 OCPP 1.6J。我们在国内有 60 个站点，如果合适可以长期合作。另外我们也在做东南亚市场，那边需要什么认证？
+From: 王工，某充电运营公司，深圳
+识别要点 国内客户但同时问东南亚认证，属渠道型客户；技术问题具体（OCPP 协议），说明有专业背景；站点数量 60，属 B 级以上；需技术顾问介入，不能只发报价。
+
+询盘分级规则
+A 级 有明确产品型号、数量达到起订量、目标市场清晰、主动提到认证或交期。24 小时内出正式报价。
+B 级 有产品和市场，但数量未定或仍在比价阶段。48 小时内回复并给出方案框架。
+C 级 信息缺失、无公司主体、只问价格。先发标准化问询模板，不报价。
+D 级 明显群发、钓鱼或诈骗邮件。标记后不再跟进。
+
+识别时优先抽取的字段
+公司名称、所在国家、客户类型、意向型号、数量、目标市场、认证需求、关注问题（价格、交期、MOQ、OEM、质保）。
